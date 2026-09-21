@@ -35,6 +35,18 @@
 
 已评估不接：DDG（中文空结果）、SearXNG（公共实例禁 JSON）、马蜂窝/大众点评（强风控）。
 
+## 地图产出（配套 travelmapify）
+
+行程 POI 可一键生成**离线单文件地图**（Leaflet + 高德栅格瓦片，GCJ-02 天然对齐，双击打开、无 key、无 HTTP 服务），三步：
+
+```bash
+echo '[{"name": "虹桥天地"}, {"name": "朱家角古镇-放生桥"}]' > pois.json
+python3 ~/.hermes/skills/travelmapify/scripts/geocode_locations.py pois.json -o geo.json --city 上海
+python3 ~/.hermes/skills/travelmapify/scripts/generate_leaflet_map.py geo.json trip.html
+```
+
+真实产出示例见 [`examples/shanghai-7d-map.html`](examples/shanghai-7d-map.html)（上海中秋+国庆 7 日行程 21 个点位，含市区/青浦/迪士尼全标注）。选型依据：高德 JS API 与 DomRender/key 授权三重耦合，栅格标点场景 Leaflet 更稳（详见 README-HERMES）。
+
 ## 环境变量
 
 | 变量 | 必需 | 说明 |
