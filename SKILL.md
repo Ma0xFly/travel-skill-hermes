@@ -54,6 +54,7 @@ read-when: >
 | `intent` | 想玩 / 想吃 / 都要 | 是 |
 | `crowd_preference` | 热闹 / 适中 / 人少 | 否 |
 | `duration` | 半天 / 一天 / 晚上 | 否 |
+| `days` | 多日总天数（2–15，从「N天」提取）；≥2 天走 days，1 天走 duration | 否 |
 | `travel_type` | 情侣 / 朋友 / 家庭 / 独行 | 否 |
 | `budget` | 预算范围 | 否 |
 | `first_time` | 是否第一次来 | 否 |

@@ -56,6 +56,8 @@ TRAVEL_TYPE_PATTERNS = [
     ("独行", ["一个人", "独自", "独行", "solo"]),
     ("朋友", ["朋友", "同学", "闺蜜", "兄弟", "同事"]),
 ]
+DAYS_PATTERN = re.compile(r"(\d{1,2})\s*天")
+MAX_DAYS = 15
 FIRST_TIME_TRUE_PATTERNS = ["第一次来", "初次来", "第一次去", "头一回来", "第一次到"]
 FIRST_TIME_FALSE_PATTERNS = ["不是第一次", "来过很多次", "之前来过", "去过好几次", "熟一点"]
 KNOWN_INFO_HINTS = {
@@ -165,6 +167,15 @@ def build_web_search_query(raw_query: str, city: Optional[str], known_info: List
     return " ".join(part for part in parts if part)
 
 
+def extract_days(text: str) -> Optional[int]:
+    """识别「N天」多日计划（N≥2）；1 天走 duration 语义，不占 days 字段。"""
+    m = DAYS_PATTERN.search(text)
+    if not m:
+        return None
+    n = int(m.group(1))
+    return n if 2 <= n <= MAX_DAYS else None
+
+
 def parse_query(query: str) -> Dict[str, Any]:
     text = normalize_text(query)
     route_points = extract_route_points(text)
@@ -172,6 +183,7 @@ def parse_query(query: str) -> Dict[str, Any]:
     city = extract_city(text)
     return {
         "city": city,
+        "days": extract_days(text),
         "intent": infer_intent(text),
         "crowd_preference": extract_by_patterns(text, CROWD_PATTERNS),
         "duration": extract_by_patterns(text, DURATION_PATTERNS),
@@ -253,6 +265,10 @@ def build_response_outline(profile: Dict[str, Any]) -> Dict[str, Any]:
         sections = ["总判断", "餐厅推荐", "推荐菜", "踩坑提醒"]
     else:
         sections = ["总判断", "主路线", "备选方案", "避坑提醒"]
+    days = profile.get("days")
+    if days and intent in {"都要", "想玩"}:
+        # 多日计划：总览表 + 逐日明细 + 整程避坑/预算，替代单日骨架
+        sections = ["总判断", f"{days}天总览表", "逐日明细", "避坑清单", "预算粗估", "行前待办"]
     return {
         "city": profile.get("city"),
         "request_type": request_type,

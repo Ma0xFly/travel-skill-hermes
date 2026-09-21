@@ -80,6 +80,7 @@
   "intent": "都要",
   "crowd_preference": "人少",
   "duration": "一天",
+  "days": 7,
   "travel_type": "情侣",
   "budget": "300-500",
   "first_time": true,
