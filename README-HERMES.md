@@ -41,6 +41,7 @@ python3 ~/.hermes/skills/travelmapify/scripts/generate_leaflet_map.py geo.json t
 ## 信源注册表（sources_registry.py，双链设计）
 
 - **web_search 链**（快速事实：开放时间/门票/政策）：**Exa(30) → Tavily(20)**；秒级响应
+  - 主题型逐日信源（不进 ENGINES，由 SKILL.md 硬规则按需调用）：**Magic Tips 客流月历**——迪士尼逐日客流+降水预测，URL 模式 `magic-tips.app/zh/renliu-rili/shanghai-disney-resort/{年}/{月}`，页面内嵌全月 JSON（date/percentage/weather_precip_sum），curl 直取无需 key；近 30 天平均误差 ±10。教训（2026-09-21）：单日客流禁止按「假期=高峰」外推，中秋末日 9/27 实为窗口内最低（33%）
 - **travel_notes 链**（深度攻略：真人体验/踩坑/路线）：**小红书(35) → B站(32) → 抖音(28)**
   - 小红书：Spider_XHS 封装，带点赞/收藏热度；⚠️ 35s 风控节流（跨进程锁），勿循环高频调用
     - ⚠️ 2026-09-21 修复回归：config.yaml 的 xhs_cookie 为多行续行式（2空格缩进），旧正则 `\s*(.+?)(?=^\w+:|\Z)` 会把后续中文注释段一起吞进 cookie → httpx header latin-1 编码炸（UnicodeEncodeError）。xhs_api.py load_cookie 已改为「主行+缩进续行，遇非缩进行即停」。往 config.yaml 加新平台段（如抖音）时务必让注释行顶格。
